@@ -1,7 +1,6 @@
 import psycopg2
-def get_connection():
-
-    conn = psycopg2.connect(
+def execute(query, values=None):
+    con = psycopg2.connect(
         dbname='price_tracker_db',
         user='postgres',
         password='postgres',
@@ -9,36 +8,50 @@ def get_connection():
         port='5432'
     )
 
-    cur = conn.cursor()
+    cur = con.cursor()
 
-    return (conn, cur)
-def close_connection(conn, cur):
+    try :
+        cur.execute(query, values)
+    finally :
+        con.commit()
+        cur.close()
+        con.close()
 
-    conn.commit()
-    conn.close()
-    cur.close()
+        print("Closed connection. Executed function")
 
-    print("Closed connection. Executed function")
-def add_product (name, url, price, last_checked):
+        if query.strip().upper().startswith("SELECT"):
+            return cur.fetchall()
 
-    con, cur = get_connection()
+def initialize_db():
+
+    query = """
+    CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        url TEXT UNIQUE NOT NULL,
+        price NUMERIC NOT NULL,
+        last_checked TIMESTAMP NOT NULL
+    );
+    """
+
+    execute(query)
+
+def add_product (name, url, price):
 
     query = """
         INSERT INTO products (name, url, price, last_checked)
-        VALUES (%s, %s, %s, %s)
+        VALUES (%s, %s, %s, NOW())
         """
-    values = (name, url, price, last_checked)
+    values = (name, url, price)
     
-    cur.execute(query, values)
-
-    close_connection(con, cur)
+    execute(query, values)
 def update_price (id, new_price):
 
-    con, cur = get_connection()
-    cur.execute("""
+    query = """
     UPDATE products
     SET price = %s, last_checked = NOW()
     WHERE id = %s;
-    """, (new_price, id))
+    """
+    values = (new_price, id)
 
-    close_connection(con, cur)
+    execute(query, values)
