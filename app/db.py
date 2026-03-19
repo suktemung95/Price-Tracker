@@ -35,7 +35,28 @@ def initialize_db():
     );
     """
 
-    execute(query)
+    con = psycopg2.connect(
+        dbname='postgres',
+        user='postgres',
+        password='postgres',
+        host='127.0.0.1',
+        port=5432
+    )
+
+    cur = con.cursor()
+
+    try:
+        cur.execute(query, values)
+    finally:
+        con.commit()
+        cur.close()
+        con.close()
+
+        print("Closed connection. Executed function")
+
+        last = query.strip().upper()
+        if last.startswith("SELECT"):
+            return cur.fetchall()
 
 def add_product (name, url, price):
 
