@@ -46,6 +46,7 @@ def add_product (name, url, price):
     values = (name, url, price)
     
     execute(query, values)
+
 def update_price (product_id, new_price):
 
     query = """
@@ -57,9 +58,9 @@ def update_price (product_id, new_price):
 
     execute(query, values)
 
-def get_product(id):
+def get_product(product_id):
 
     query = """
     SELECT * FROM products
     WHERE id=%s"""
-    return execute(query, (id))
+    return execute(query, (product_id)) 
