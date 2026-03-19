@@ -10,18 +10,19 @@ def execute(query, values=None):
 
     cur = con.cursor()
 
-    try :
+    try:
         cur.execute(query, values)
-    finally :
+    finally:
         con.commit()
         cur.close()
         con.close()
 
         print("Closed connection. Executed function")
 
-        if query.strip().upper().startswith("SELECT"):
+        last = query.strip().upper()
+        if last.startswith("SELECT"):
             return cur.fetchall()
-
+ 
 def initialize_db():
 
     query = """
@@ -45,13 +46,20 @@ def add_product (name, url, price):
     values = (name, url, price)
     
     execute(query, values)
-def update_price (id, new_price):
+def update_price (product_id, new_price):
 
     query = """
     UPDATE products
     SET price = %s, last_checked = NOW()
     WHERE id = %s;
     """
-    values = (new_price, id)
+    values = (new_price, product_id)
 
     execute(query, values)
+
+def get_product(id):
+
+    query = """
+    SELECT * FROM products
+    WHERE id=%s"""
+    return execute(query, (id))
