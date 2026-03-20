@@ -20,7 +20,7 @@ def execute(query, values=None):
         if last.startswith("SELECT"):
             res = cur.fetchall()
         # on an INSERT statement, return the product id
-        elif last.startswith("INSERT"):
+        elif last.startswith("INSERT") or last.startswith("UPDATE"):
             res = cur.fetchone()
 
         con.commit()
@@ -76,18 +76,19 @@ def add_product (name, url, price):
         """
     values = (name, url, price)
     
-    execute(query, values)
+    return execute(query, values)
 
 def update_price (product_id, new_price):
 
     query = """
     UPDATE products
     SET price = %s, last_checked = NOW()
-    WHERE id = %s;
+    WHERE id = %s
+    RETURNING price;
     """
     values = (new_price, product_id)
 
-    execute(query, values)
+    return execute(query, values)
 
 def get_product(product_id):
 
