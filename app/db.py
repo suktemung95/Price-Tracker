@@ -1,7 +1,7 @@
 import psycopg2
 def execute(query, values=None):
     con = psycopg2.connect(
-        dbname='price_tracker_db',
+        dbname='postgres',
         user='postgres',
         password='postgres',
         host='localhost',
@@ -11,17 +11,26 @@ def execute(query, values=None):
     cur = con.cursor()
 
     try:
+        # execute query
         cur.execute(query, values)
-    finally:
+
+        last = query.strip().upper()
+        res = None
+        # on a select statement, return the selected objects
+        if last.startswith("SELECT"):
+            res = cur.fetchall()
+        # on an INSERT statement, return the product id
+        elif last.startswith("INSERT"):
+            res = cur.fetchone()
+
         con.commit()
+        return res
+
+    finally:
         cur.close()
         con.close()
 
         print("Closed connection. Executed function")
-
-        last = query.strip().upper()
-        if last.startswith("SELECT"):
-            return cur.fetchall()
  
 def initialize_db():
 
@@ -46,7 +55,7 @@ def initialize_db():
     cur = con.cursor()
 
     try:
-        cur.execute(query, values)
+        cur.execute(query)
     finally:
         con.commit()
         cur.close()
@@ -61,8 +70,9 @@ def initialize_db():
 def add_product (name, url, price):
 
     query = """
-        INSERT INTO products (name, url, price, last_checked)
+        INSERT INTO products (name, url, price, last_checked) 
         VALUES (%s, %s, %s, NOW())
+        RETURNING id
         """
     values = (name, url, price)
     

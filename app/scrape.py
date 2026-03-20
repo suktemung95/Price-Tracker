@@ -35,8 +35,8 @@ def extract_price(soup):
 def clean_price(price_text):
     return float(price_text.replace("$", "").strip())
 
-def get_price_from_url(url):
+def get_product_from_url(url):
     html = fetch_page(url)
     soup = parse_html(html)
     cost, name = extract_price(soup)
-    return [name, url, clean_text(cost)]
+    return [name, clean_price(cost)]
