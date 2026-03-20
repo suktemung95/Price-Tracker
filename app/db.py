@@ -21,7 +21,7 @@ def execute(query, values=None):
             res = cur.fetchall()
         # on an INSERT statement, return the product id
         elif last.startswith("INSERT") or last.startswith("UPDATE"):
-            res = cur.fetchone()
+            res = cur.fetchall()
 
         con.commit()
         return res
@@ -96,3 +96,10 @@ def get_product(product_id):
     SELECT * FROM products
     WHERE id=%s"""
     return execute(query, (product_id)) 
+
+def get_all_products():
+
+    query = """
+    SELECT * from products
+    """
+    return execute (query)
