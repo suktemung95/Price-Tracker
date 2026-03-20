@@ -19,9 +19,18 @@ def execute(query, values=None):
         # on a select statement, return the selected objects
         if last.startswith("SELECT"):
             res = cur.fetchall()
-        # on an INSERT statement, return the product id
-        elif last.startswith("INSERT") or last.startswith("UPDATE"):
-            res = cur.fetchall()
+            columns = ["id", "name", "url", "price", "last_checked"]      # must match the order in SELECT
+            res = dict(zip(columns, res)) # {"id": 6, "price": 29.99}
+            
+        # on an INSERT or UPDATE statement, return the product id
+        elif last.startswith("INSERT"):
+            res = cur.fetchone()
+            columns = ["id", "name", "url", "price", "last_checked"]      # must match the order in SELECT
+            res = dict(zip(columns, res)) # {"id": 6, "price": 29.99}
+
+        elif last.startswith("UPDATE"):
+            res = cur.fetchone()  # e.g., (6, 29.99)
+            res = {"id": res[0], "new_price": res[1]}
 
         con.commit()
         return res
@@ -84,7 +93,7 @@ def update_price (product_id, new_price):
     UPDATE products
     SET price = %s, last_checked = NOW()
     WHERE id = %s
-    RETURNING price;
+    RETURNING id, price;
     """
     values = (new_price, product_id)
 
@@ -95,7 +104,7 @@ def get_product(product_id):
     query = """
     SELECT * FROM products
     WHERE id=%s"""
-    return execute(query, (product_id)) 
+    return execute(query, (product_id,)) 
 
 def get_all_products():
 
