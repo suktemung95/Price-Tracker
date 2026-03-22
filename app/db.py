@@ -25,14 +25,10 @@ def execute(query, values=None):
             res = [dict(zip(columns, row)) for row in rows]
             
         # on an INSERT or UPDATE statement, return the product id
-        elif last.startswith("INSERT"):
+        elif last.startswith(("INSERT", "UPDATE", "DELETE")):
             res = cur.fetchone()
-            columns = ["id", "name", "url", "price", "last_checked"]      # must match the order in SELECT
-            res = dict(zip(columns, res)) # {"id": 6, "price": 29.99}
-
-        elif last.startswith("UPDATE"):
-            res = cur.fetchone()  # e.g., (6, 29.99)
-            res = {"id": res[0], "new_price": res[1]}
+            columns = ["id", "name", "url", "price", "last_checked"]
+            res = dict(zip(columns, res)) 
 
         con.commit()
         return res
@@ -120,6 +116,7 @@ def delete_product(product_id):
     query = """
     DELETE FROM products
     WHERE id = %s
-    RETURNING *"""
+    RETURNING *;
+    """
 
     return execute(query, (product_id,))

@@ -28,8 +28,8 @@ def get_product(product_id: int):
 def post_product(product: Product):
     product = db.add_product(product.name, product.url, product.price)
 
-    # if not product:
-    #     raise HTTPException(404, "Product not found")
+    if not product:
+        raise HTTPException(404, "Product not found")
     
     return product
 
