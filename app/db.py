@@ -18,9 +18,11 @@ def execute(query, values=None):
         res = None
         # on a select statement, return the selected objects
         if last.startswith("SELECT"):
-            res = cur.fetchall()
-            columns = ["id", "name", "url", "price", "last_checked"]      # must match the order in SELECT
-            res = dict(zip(columns, res)) # {"id": 6, "price": 29.99}
+            rows = cur.fetchall()
+
+            columns = ["id", "name", "url", "price", "last_checked"]
+
+            res = [dict(zip(columns, row)) for row in rows]
             
         # on an INSERT or UPDATE statement, return the product id
         elif last.startswith("INSERT"):
@@ -81,7 +83,7 @@ def add_product (name, url, price):
     query = """
         INSERT INTO products (name, url, price, last_checked) 
         VALUES (%s, %s, %s, NOW())
-        RETURNING id
+        RETURNING *
         """
     values = (name, url, price)
     
@@ -112,3 +114,12 @@ def get_all_products():
     SELECT * from products
     """
     return execute (query)
+
+def delete_product(product_id):
+
+    query = """
+    DELETE FROM products
+    WHERE id = %s
+    RETURNING *"""
+
+    return execute(query, (product_id,))
