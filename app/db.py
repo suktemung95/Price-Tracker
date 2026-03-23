@@ -18,17 +18,11 @@ def execute(query, values=None):
         res = None
         # on a select statement, return the selected objects
         if last.startswith("SELECT"):
-            rows = cur.fetchall()
-
-            columns = ["id", "name", "url", "price", "last_checked"]
-
-            res = [dict(zip(columns, row)) for row in rows]
+            res = cur.fetchall()
             
         # on an INSERT or UPDATE statement, return the product id
         elif last.startswith(("INSERT", "UPDATE", "DELETE")):
             res = cur.fetchone()
-            columns = ["id", "name", "url", "price", "last_checked"]
-            res = dict(zip(columns, res)) 
 
         con.commit()
         return res
