@@ -24,8 +24,28 @@ def get_product(product_id):
     formatted_product = format(product)
     return formatted_product
 
-def get_all_products():
-    products = db.get_all_products()
+def get_products(min_price, max_price, name, min_id, max_id):
+
+    conditions = []
+    values = []
+
+    if min_price:
+        conditions.append("price >= %s")
+        values.append(min_price)
+    if max_price:
+        conditions.append("price <= %s")
+        values.append(max_price)
+    if name:
+        conditions.append("name ILIKE %s")
+        values.append(f"%{name}%")
+    if min_id:
+        conditions.append("id >= %s")
+        values.append(min_id)
+    if max_id:
+        conditions.append("id <= %s")
+        values.append(max_id)
+
+    products = db.get_products(conditions, values)
     formatted_products = format_all(products)
     return formatted_products
 

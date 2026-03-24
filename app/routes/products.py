@@ -18,8 +18,14 @@ def initalize_db():
     return db.initialize_db()
 
 @app.get("/products")
-def get_products():
-    return s.get_all_products()
+def get_products(
+    min_price: float = None,
+    max_price: float = None,
+    name: str = None,
+    min_id: int = None,
+    max_id: int = None
+):
+    return s.get_products(min_price, max_price, name, min_id, max_id)
 
 @app.get("/products/{product_id}")
 def get_product(product_id: int):

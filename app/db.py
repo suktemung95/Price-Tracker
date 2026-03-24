@@ -98,12 +98,15 @@ def get_product(product_id):
     WHERE id=%s"""
     return execute(query, (product_id,)) 
 
-def get_all_products():
+def get_products(conditions, values=None):
 
     query = """
     SELECT * from products
     """
-    return execute (query)
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+    
+    return execute (query, values)
 
 def delete_product(product_id):
 
