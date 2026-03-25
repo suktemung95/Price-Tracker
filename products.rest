@@ -12,4 +12,12 @@ Content-Type: application/json
 
 
 ###
-GET http://localhost:8000/products
+GET http://localhost:8000/products?max_id=7
+
+###
+POST http://localhost:8000/scrape
+Content-Type: application/json
+
+{
+  "url": "https://aulagear.com/products/aula-sc390"
+}

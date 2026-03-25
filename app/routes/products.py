@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status, HTTPException
+from fastapi import status, HTTPException, APIRouter 
 from pydantic import BaseModel
 import services.productServices as s
 import db
@@ -12,12 +12,9 @@ class ProductUpdatePrice(BaseModel):
     product_id: int
     price: float
 
-app = FastAPI()
-@app.post("/start")
-def initalize_db():
-    return db.initialize_db()
+router = APIRouter()
 
-@app.get("/products")
+@router.get("/")
 def get_products(
     min_price: float = None,
     max_price: float = None,
@@ -27,7 +24,7 @@ def get_products(
 ):
     return s.get_products(min_price, max_price, name, min_id, max_id)
 
-@app.get("/products/{product_id}")
+@router.get("/{product_id}")
 def get_product(product_id: int):
 
     product = s.get_product(product_id)
@@ -36,7 +33,7 @@ def get_product(product_id: int):
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
-@app.post("/products", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def post_product(product: Product):
     product = s.add_product(product.name, product.url, product.price)
 
@@ -45,7 +42,7 @@ def post_product(product: Product):
     
     return product
 
-@app.patch("/products")
+@router.patch("/")
 def update_price(product: ProductUpdatePrice):
     updated = s.update_price(product.product_id, product.price)
 
@@ -54,7 +51,7 @@ def update_price(product: ProductUpdatePrice):
 
     return updated
 
-@app.delete("/products/{product_id}")
+@router.delete("/{product_id}")
 def delete_product(product_id: int):
     deleted = s.delete_product(product_id)
 

@@ -1,9 +1,9 @@
 # Done 
 - refactor to use services instead of just db 
-- make a formatting function in services
 
 # Mostly Done
 - fix HTTP status codes to return consistently
+- make a formatting function in services
 - return json data consistently
 - filters
 
